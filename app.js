@@ -45,6 +45,7 @@ const defaultData = {
   rewards: [],
   rewardProgress: {},
   rewardCelebrations: {}
+  rewardProgress: {}
 };
 
 const iconSuggestions = {
@@ -598,6 +599,9 @@ let editingRewardId = null;
 
 hideElement(rewardPopup);
 
+let editingStoryId = null;
+let editingRewardId = null;
+
 function renderStoryList() {
   storyList.innerHTML = '';
   stories.forEach((story, index) => {
@@ -809,6 +813,16 @@ rewardForm.addEventListener('submit', async (event) => {
   writeStorage(storageKeys.rewards, rewards);
   writeStorage(storageKeys.rewardProgress, rewardProgress);
   writeStorage(storageKeys.rewardCelebrations, rewardCelebrations);
+    }
+  } else {
+    // Ensure only one reward per story
+    rewards = rewards.filter((r) => r.storyId !== storyId);
+    const newReward = { id: `reward-${Date.now()}`, storyId, name, target, image };
+    rewards.push(newReward);
+    rewardProgress[newReward.id] = 0;
+  }
+  writeStorage(storageKeys.rewards, rewards);
+  writeStorage(storageKeys.rewardProgress, rewardProgress);
   renderStoryList();
   editingRewardId = null;
   rewardForm.reset();
@@ -824,6 +838,7 @@ function addSticker(reward) {
   speak('Great job!');
   const total = rewardProgress[reward.id];
   if (total >= reward.target && rewardCelebrations[reward.id] !== total) {
+  if (rewardProgress[reward.id] >= reward.target) {
     showElement(rewardPopup);
     rewardPopupImage.src = reward.image;
     rewardPopupText.textContent = reward.name;
