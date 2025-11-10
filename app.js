@@ -72,6 +72,11 @@ const clone = (value) => (typeof structuredClone === 'function'
   ? structuredClone(value)
   : JSON.parse(JSON.stringify(value)));
 
+const noop = () => {};
+
+let updateNowNextLibraryOptions = noop;
+let renderScheduleLibrary = noop;
+
 function readStorage(key, fallback) {
   try {
     const raw = localStorage.getItem(key);
@@ -179,6 +184,13 @@ function ensureDefaultCards(key, defaults, { type } = {}) {
 }
 
 function ensurePin() {
+  try {
+    const saved = localStorage.getItem(storageKeys.pin);
+    if (!saved) {
+      localStorage.setItem(storageKeys.pin, '1234');
+    }
+  } catch (error) {
+    console.warn('PIN storage unavailable', error);
   const saved = localStorage.getItem(storageKeys.pin);
   if (!saved) {
     localStorage.setItem(storageKeys.pin, '1234');
@@ -288,16 +300,61 @@ pinModal.addEventListener('click', (event) => {
 });
 
 // ---------------------- Emotion Board ----------------------
+  let emotions = ensureDefaultCards(storageKeys.emotions, defaultData.emotions, { type: 'emotion' });
   const emotionBoard = document.getElementById('emotionBoard');
   const emotionForm = document.getElementById('emotionForm');
   const emotionTextInput = document.getElementById('emotionText');
   const emotionImageInput = document.getElementById('emotionImage');
+
+  if (requireElements([
   if (!requireElements([
     ['emotionBoard', emotionBoard],
     ['emotionForm', emotionForm],
     ['emotionTextInput', emotionTextInput],
     ['emotionImageInput', emotionImageInput],
   ], 'Emotion board')) {
+    const renderEmotions = () => {
+      emotionBoard.innerHTML = '';
+      emotions.forEach((emotion) => {
+        const card = createCard(emotion, (cardNode) => {
+          emotionBoard.querySelectorAll('.card').forEach((c) => c.classList.remove('active'));
+          cardNode.classList.add('active');
+          speak(emotion.sentence || `I feel ${emotion.text}.`);
+        });
+        emotionBoard.appendChild(card);
+      });
+      updateNowNextLibraryOptions();
+    };
+
+    renderEmotions();
+
+    emotionForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const text = emotionTextInput.value.trim();
+      if (!text) return;
+      let imageSrc = 'assets/placeholder-generic.svg';
+      if (emotionImageInput.files[0]) {
+        imageSrc = await readFileAsDataURL(emotionImageInput.files[0]);
+      }
+      const newEmotion = {
+        id: `${text.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
+        text,
+        sentence: `I feel ${text.toLowerCase()}.`,
+        image: imageSrc
+      };
+      emotions.push(newEmotion);
+      writeStorage(storageKeys.emotions, emotions);
+      renderEmotions();
+      renderScheduleLibrary();
+      emotionForm.reset();
+      hideElement(emotionForm);
+    });
+  } else {
+    console.warn('Emotion board markup missing; skipping emotion UI render.');
+  }
+
+// ---------------------- Needs Board ----------------------
+  let needs = ensureDefaultCards(storageKeys.needs, defaultData.needs, { type: 'need' });
     return;
   }
 let emotions = ensureDefaultCards(storageKeys.emotions, defaultData.emotions, { type: 'emotion' });
@@ -353,6 +410,8 @@ emotionForm.addEventListener('submit', async (event) => {
   const needImageInput = document.getElementById('needImage');
   const needsCategoryFilter = document.getElementById('needsCategory');
   const needsSentence = document.getElementById('needsSentence');
+
+  if (requireElements([
   if (!requireElements([
     ['needsBoard', needsBoard],
     ['needsForm', needsForm],
@@ -360,6 +419,71 @@ emotionForm.addEventListener('submit', async (event) => {
     ['needCategorySelect', needCategorySelect],
     ['needImageInput', needImageInput],
   ], 'Needs board')) {
+    const populateNeedCategories = () => {
+      if (!needsCategoryFilter) return;
+      const categories = Array.from(new Set(needs.map((n) => n.category)));
+      needsCategoryFilter.innerHTML = '<option value="all">All</option>' + categories.map((c) => `<option value="${c}">${c}</option>`).join('');
+    };
+
+    const renderNeeds = (filter = 'all') => {
+      needsBoard.innerHTML = '';
+      if (needsSentence) needsSentence.textContent = '';
+      const filtered = filter === 'all' ? needs : needs.filter((item) => item.category === filter);
+      filtered.forEach((need) => {
+        const card = createCard(need, (cardNode) => {
+          needsBoard.querySelectorAll('.card').forEach((c) => c.classList.remove('active'));
+          cardNode.classList.add('active');
+          const sentence = need.sentence || `I want ${need.text.toLowerCase()}.`;
+          speak(sentence);
+          if (needsSentence) {
+            needsSentence.textContent = sentence;
+          }
+        });
+        needsBoard.appendChild(card);
+      });
+      updateNowNextLibraryOptions();
+    };
+
+    populateNeedCategories();
+    renderNeeds();
+
+    needsForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const text = needTextInput.value.trim();
+      const category = needCategorySelect.value;
+      if (!text) return;
+      let imageSrc = 'assets/placeholder-generic.svg';
+      if (needImageInput.files[0]) {
+        imageSrc = await readFileAsDataURL(needImageInput.files[0]);
+      }
+      const newNeed = {
+        id: `${text.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
+        text,
+        sentence: `I want ${text.toLowerCase()}.`,
+        category,
+        image: imageSrc
+      };
+      needs.push(newNeed);
+      writeStorage(storageKeys.needs, needs);
+      populateNeedCategories();
+      if (needsCategoryFilter) {
+        renderNeeds(needsCategoryFilter.value);
+      } else {
+        renderNeeds();
+      }
+      renderScheduleLibrary();
+      needsForm.reset();
+      hideElement(needsForm);
+    });
+
+    if (needsCategoryFilter) {
+      needsCategoryFilter.addEventListener('change', () => {
+        renderNeeds(needsCategoryFilter.value);
+      });
+    }
+  } else {
+    console.warn('Needs board markup missing; skipping needs UI render.');
+  }
     return;
   }
 const needsBoard = document.getElementById('needsBoard');
@@ -441,11 +565,17 @@ if (needsCategoryFilter) {
   const scheduleLibraryToggle = document.getElementById('scheduleLibraryToggle');
   const scheduleTemplateSave = document.getElementById('scheduleTemplateSave');
   const scheduleTemplateLoad = document.getElementById('scheduleTemplateLoad');
+  if (requireElements([
   if (!requireElements([
     ['scheduleChildView', scheduleChildView],
     ['scheduleParentView', scheduleParentView],
     ['scheduleDrop', scheduleDrop],
     ['scheduleLibrary', scheduleLibrary],
+  ], 'Schedule module')) {
+let schedule = readStorage(storageKeys.schedule, defaultData.schedule);
+let scheduleTemplates = readStorage(storageKeys.scheduleTemplates, defaultData.scheduleTemplates);
+
+    const updateScheduleViews = () => {
   ], "Schedule module")) {
     return;
   }
@@ -480,6 +610,9 @@ function updateScheduleViews() {
     dropItem.innerHTML = `<img src="${item.image}" alt="${item.text}"><span>${item.text}</span><div class="schedule-controls parent-only"><button type="button" class="secondary move-up">⬆</button><button type="button" class="secondary move-down">⬇</button><button type="button" class="secondary remove">✕</button></div>`;
     scheduleDrop.appendChild(dropItem);
   });
+    };
+
+    renderScheduleLibrary = () => {
 }
 
 function renderScheduleLibrary() {
@@ -498,6 +631,12 @@ function renderScheduleLibrary() {
     });
     scheduleLibrary.appendChild(card);
   });
+    };
+
+    renderScheduleLibrary();
+    updateScheduleViews();
+
+    scheduleDrop.addEventListener('dragover', (event) => {
 }
 
 renderScheduleLibrary();
@@ -576,6 +715,10 @@ if (scheduleTemplateLoad) {
     updateScheduleViews();
   });
 }
+
+  } else {
+    console.warn('Schedule markup missing; skipping schedule UI render.');
+  }
 
 // ---------------------- Now & Next ----------------------
   const nowCard = document.getElementById('nowCard');
@@ -679,6 +822,7 @@ function getLibraryCards() {
   return [...emotions, ...needs];
 }
 
+  updateNowNextLibraryOptions = () => {
 function updateNowNextLibraryOptions() {
   if (!nowLibrarySelect || !nextLibrarySelect) {
     nowLibrarySelect = document.getElementById('nowLibrarySelect');
@@ -698,6 +842,7 @@ function updateNowNextLibraryOptions() {
   nowLibrarySelect.innerHTML = options;
   nextLibrarySelect.innerHTML = options;
   if (applyNowNextLibrary) applyNowNextLibrary.disabled = false;
+  };
 }
 
 updateNowNextLibraryOptions();

@@ -14,11 +14,50 @@
 
   <main>
     <section id="modeNotice" class="mode-notice" aria-live="polite">Child Mode Active</section>
+    <noscript class="noscript-warning">Please enable JavaScript to use interactive features.</noscript>
 
     <section class="module" id="emotionModule">
       <div class="module-header">
         <h2>Emotion Board</h2>
         <button class="add-btn parent-only" data-target="emotion">+ Add Emotion</button>
+      </div>
+      <div id="emotionBoard" class="card-grid">
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-happy.svg" alt="Happy">
+          <p>Happy</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-sad.svg" alt="Sad">
+          <p>Sad</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-angry.svg" alt="Angry">
+          <p>Angry</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-tired.svg" alt="Tired">
+          <p>Tired</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-excited.svg" alt="Excited">
+          <p>Excited</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-worried.svg" alt="Worried">
+          <p>Worried</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-calm.svg" alt="Calm">
+          <p>Calm</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-scared.svg" alt="Scared">
+          <p>Scared</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-frustrated.svg" alt="Frustrated">
+          <p>Frustrated</p>
+        </div>
       </div>
       <div id="emotionBoard" class="card-grid"></div>
       <form id="emotionForm" class="card-form parent-only" hidden>
@@ -44,6 +83,48 @@
       <div class="needs-filter parent-only" hidden>
         <label for="needsCategory">Filter by category</label>
         <select id="needsCategory"></select>
+      </div>
+      <div id="needsBoard" class="card-grid">
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-toilet.svg" alt="Toilet">
+          <p>Toilet</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-eat.svg" alt="Eat">
+          <p>Eat</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-drink.svg" alt="Drink">
+          <p>Drink</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-break.svg" alt="Break">
+          <p>Break</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-help.svg" alt="Help">
+          <p>Help</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-play.svg" alt="Play">
+          <p>Play</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-sleep.svg" alt="Sleep">
+          <p>Sleep</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-outside.svg" alt="Go Outside">
+          <p>Go Outside</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-music.svg" alt="Music">
+          <p>Music</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-quiet.svg" alt="Quiet Time">
+          <p>Quiet Time</p>
+        </div>
       </div>
       <div id="needsBoard" class="card-grid"></div>
       <div id="needsSentence" class="sentence-banner child-only"></div>
