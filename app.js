@@ -31,6 +31,7 @@ const defaultData = {
     { id: 'calm', text: 'Calm', sentence: 'I feel calm.', image: 'assets/placeholder-calm.svg' },
     { id: 'scared', text: 'Scared', sentence: 'I feel scared.', image: 'assets/placeholder-scared.svg' },
     { id: 'frustrated', text: 'Frustrated', sentence: 'I feel frustrated.', image: 'assets/placeholder-frustrated.svg' }
+    { id: 'worried', text: 'Worried', sentence: 'I feel worried.', image: 'assets/placeholder-worried.svg' }
   ],
   needs: [
     { id: 'toilet', text: 'Toilet', sentence: 'I want the toilet.', category: 'Places', image: 'assets/placeholder-toilet.svg' },
@@ -43,6 +44,7 @@ const defaultData = {
     { id: 'outside', text: 'Go Outside', sentence: 'I want to go outside.', category: 'Places', image: 'assets/placeholder-outside.svg' },
     { id: 'music', text: 'Music', sentence: 'I want music.', category: 'Activities', image: 'assets/placeholder-music.svg' },
     { id: 'quiet', text: 'Quiet Time', sentence: 'I want quiet time.', category: 'Activities', image: 'assets/placeholder-quiet.svg' }
+    { id: 'sleep', text: 'Sleep', sentence: 'I want to sleep.', category: 'Activities', image: 'assets/placeholder-sleep.svg' }
   ],
   schedule: [],
   scheduleTemplates: [],
@@ -51,6 +53,7 @@ const defaultData = {
   rewards: [],
   rewardProgress: {},
   rewardCelebrations: {}
+  rewardProgress: {}
 };
 
 const iconSuggestions = {
@@ -138,6 +141,11 @@ function showElement(el) {
 
 function hideElement(el) {
   if (el) el.hidden = true;
+  el.hidden = false;
+}
+
+function hideElement(el) {
+  el.hidden = true;
 }
 
 function toggleClass(element, className, condition) {
@@ -183,6 +191,9 @@ function ensurePin() {
     }
   } catch (error) {
     console.warn('PIN storage unavailable', error);
+  const saved = localStorage.getItem(storageKeys.pin);
+  if (!saved) {
+    localStorage.setItem(storageKeys.pin, '1234');
   }
 }
 
@@ -230,6 +241,31 @@ function initialize() {
       hideElement(pinModal);
     }
   }
+// ---------------------- Parent Mode ----------------------
+let parentMode = false;
+const parentToggleBtn = document.getElementById('parentToggle');
+const pinModal = document.getElementById('pinModal');
+const pinInput = document.getElementById('pinInput');
+const pinSubmit = document.getElementById('pinSubmit');
+const pinCancel = document.getElementById('pinCancel');
+const modeNotice = document.getElementById('modeNotice');
+
+ensurePin();
+
+function setParentMode(enabled) {
+  parentMode = enabled;
+  document.querySelectorAll('.parent-only').forEach((el) => {
+    el.hidden = !enabled;
+  });
+  document.querySelectorAll('.child-only').forEach((el) => {
+    el.hidden = enabled;
+  });
+  modeNotice.textContent = enabled ? 'Parent Mode Active' : 'Child Mode Active';
+  parentToggleBtn.textContent = enabled ? 'Exit Parent Mode' : 'Parent Mode';
+  if (!enabled) {
+    hideElement(pinModal);
+  }
+}
 
 parentToggleBtn.addEventListener('click', () => {
   if (parentMode) {
@@ -271,6 +307,7 @@ pinModal.addEventListener('click', (event) => {
   const emotionImageInput = document.getElementById('emotionImage');
 
   if (requireElements([
+  if (!requireElements([
     ['emotionBoard', emotionBoard],
     ['emotionForm', emotionForm],
     ['emotionTextInput', emotionTextInput],
@@ -318,6 +355,54 @@ pinModal.addEventListener('click', (event) => {
 
 // ---------------------- Needs Board ----------------------
   let needs = ensureDefaultCards(storageKeys.needs, defaultData.needs, { type: 'need' });
+    return;
+  }
+let emotions = ensureDefaultCards(storageKeys.emotions, defaultData.emotions, { type: 'emotion' });
+const emotionBoard = document.getElementById('emotionBoard');
+const emotionForm = document.getElementById('emotionForm');
+const emotionTextInput = document.getElementById('emotionText');
+const emotionImageInput = document.getElementById('emotionImage');
+let emotions = ensureDefaultCards(storageKeys.emotions, defaultData.emotions, { type: 'emotion' });
+let emotions = readStorage(storageKeys.emotions, defaultData.emotions);
+
+function renderEmotions() {
+  emotionBoard.innerHTML = '';
+  emotions.forEach((emotion) => {
+    const card = createCard(emotion, (cardNode) => {
+      emotionBoard.querySelectorAll('.card').forEach((c) => c.classList.remove('active'));
+      cardNode.classList.add('active');
+      speak(emotion.sentence || `I feel ${emotion.text}.`);
+    });
+    emotionBoard.appendChild(card);
+  });
+  updateNowNextLibraryOptions();
+}
+
+renderEmotions();
+
+emotionForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const text = emotionTextInput.value.trim();
+  if (!text) return;
+  let imageSrc = 'assets/placeholder-generic.svg';
+  if (emotionImageInput.files[0]) {
+    imageSrc = await readFileAsDataURL(emotionImageInput.files[0]);
+  }
+  const newEmotion = {
+    id: `${text.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
+    text,
+    sentence: `I feel ${text.toLowerCase()}.`,
+    image: imageSrc
+  };
+  emotions.push(newEmotion);
+  writeStorage(storageKeys.emotions, emotions);
+  renderEmotions();
+  renderScheduleLibrary();
+  emotionForm.reset();
+  hideElement(emotionForm);
+});
+
+// ---------------------- Needs Board ----------------------
   const needsBoard = document.getElementById('needsBoard');
   const needsForm = document.getElementById('needsForm');
   const needTextInput = document.getElementById('needText');
@@ -327,6 +412,7 @@ pinModal.addEventListener('click', (event) => {
   const needsSentence = document.getElementById('needsSentence');
 
   if (requireElements([
+  if (!requireElements([
     ['needsBoard', needsBoard],
     ['needsForm', needsForm],
     ['needTextInput', needTextInput],
@@ -398,6 +484,78 @@ pinModal.addEventListener('click', (event) => {
   } else {
     console.warn('Needs board markup missing; skipping needs UI render.');
   }
+    return;
+  }
+const needsBoard = document.getElementById('needsBoard');
+const needsForm = document.getElementById('needsForm');
+const needTextInput = document.getElementById('needText');
+const needCategorySelect = document.getElementById('needCategory');
+const needImageInput = document.getElementById('needImage');
+const needsCategoryFilter = document.getElementById('needsCategory');
+const needsSentence = document.getElementById('needsSentence');
+let needs = ensureDefaultCards(storageKeys.needs, defaultData.needs, { type: 'need' });
+
+function populateNeedCategories() {
+  if (!needsCategoryFilter) return;
+let needs = readStorage(storageKeys.needs, defaultData.needs);
+
+function populateNeedCategories() {
+  const categories = Array.from(new Set(needs.map((n) => n.category)));
+  needsCategoryFilter.innerHTML = '<option value="all">All</option>' + categories.map((c) => `<option value="${c}">${c}</option>`).join('');
+}
+
+function renderNeeds(filter = 'all') {
+  needsBoard.innerHTML = '';
+  if (needsSentence) needsSentence.textContent = '';
+  const filtered = filter === 'all' ? needs : needs.filter((item) => item.category === filter);
+  filtered.forEach((need) => {
+    const card = createCard(need, (cardNode) => {
+      needsBoard.querySelectorAll('.card').forEach((c) => c.classList.remove('active'));
+      cardNode.classList.add('active');
+      const sentence = need.sentence || `I want ${need.text.toLowerCase()}.`;
+      speak(sentence);
+      if (needsSentence) {
+        needsSentence.textContent = sentence;
+      }
+    });
+    needsBoard.appendChild(card);
+  });
+  updateNowNextLibraryOptions();
+}
+
+populateNeedCategories();
+renderNeeds();
+
+needsForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const text = needTextInput.value.trim();
+  const category = needCategorySelect.value;
+  if (!text) return;
+  let imageSrc = 'assets/placeholder-generic.svg';
+  if (needImageInput.files[0]) {
+    imageSrc = await readFileAsDataURL(needImageInput.files[0]);
+  }
+  const newNeed = {
+    id: `${text.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
+    text,
+    sentence: `I want ${text.toLowerCase()}.`,
+    category,
+    image: imageSrc
+  };
+  needs.push(newNeed);
+  writeStorage(storageKeys.needs, needs);
+  populateNeedCategories();
+  renderNeeds(needsCategoryFilter.value);
+  renderScheduleLibrary();
+  needsForm.reset();
+  hideElement(needsForm);
+});
+
+if (needsCategoryFilter) {
+  needsCategoryFilter.addEventListener('change', () => {
+    renderNeeds(needsCategoryFilter.value);
+  });
+}
 
 // ---------------------- Schedule Module ----------------------
   const scheduleChildView = document.getElementById('scheduleChildView');
@@ -408,6 +566,7 @@ pinModal.addEventListener('click', (event) => {
   const scheduleTemplateSave = document.getElementById('scheduleTemplateSave');
   const scheduleTemplateLoad = document.getElementById('scheduleTemplateLoad');
   if (requireElements([
+  if (!requireElements([
     ['scheduleChildView', scheduleChildView],
     ['scheduleParentView', scheduleParentView],
     ['scheduleDrop', scheduleDrop],
@@ -417,6 +576,25 @@ let schedule = readStorage(storageKeys.schedule, defaultData.schedule);
 let scheduleTemplates = readStorage(storageKeys.scheduleTemplates, defaultData.scheduleTemplates);
 
     const updateScheduleViews = () => {
+  ], "Schedule module")) {
+    return;
+  }
+needsCategoryFilter.addEventListener('change', () => {
+  renderNeeds(needsCategoryFilter.value);
+});
+
+// ---------------------- Schedule Module ----------------------
+const scheduleChildView = document.getElementById('scheduleChildView');
+const scheduleParentView = document.getElementById('scheduleParentView');
+const scheduleDrop = document.getElementById('scheduleDrop');
+const scheduleLibrary = document.getElementById('scheduleLibrary');
+const scheduleLibraryToggle = document.getElementById('scheduleLibraryToggle');
+const scheduleTemplateSave = document.getElementById('scheduleTemplateSave');
+const scheduleTemplateLoad = document.getElementById('scheduleTemplateLoad');
+let schedule = readStorage(storageKeys.schedule, defaultData.schedule);
+let scheduleTemplates = readStorage(storageKeys.scheduleTemplates, defaultData.scheduleTemplates);
+
+function updateScheduleViews() {
   scheduleChildView.innerHTML = '';
   scheduleDrop.innerHTML = '';
   schedule.forEach((item, index) => {
@@ -435,6 +613,9 @@ let scheduleTemplates = readStorage(storageKeys.scheduleTemplates, defaultData.s
     };
 
     renderScheduleLibrary = () => {
+}
+
+function renderScheduleLibrary() {
   scheduleLibrary.innerHTML = '';
   const library = [...emotions, ...needs];
   library.forEach((item) => {
@@ -456,6 +637,12 @@ let scheduleTemplates = readStorage(storageKeys.scheduleTemplates, defaultData.s
     updateScheduleViews();
 
     scheduleDrop.addEventListener('dragover', (event) => {
+}
+
+renderScheduleLibrary();
+updateScheduleViews();
+
+scheduleDrop.addEventListener('dragover', (event) => {
   event.preventDefault();
   event.dataTransfer.dropEffect = 'copy';
 });
@@ -543,6 +730,9 @@ if (scheduleTemplateLoad) {
   nowLibrarySelect = document.getElementById('nowLibrarySelect');
   nextLibrarySelect = document.getElementById('nextLibrarySelect');
   applyNowNextLibrary = document.getElementById('applyNowNextLibrary');
+  const nowLibrarySelect = document.getElementById('nowLibrarySelect');
+  const nextLibrarySelect = document.getElementById('nextLibrarySelect');
+  const applyNowNextLibrary = document.getElementById('applyNowNextLibrary');
   const nowTextInput = document.getElementById('nowText');
   const nextTextInput = document.getElementById('nextText');
   const nowImageInput = document.getElementById('nowImage');
@@ -560,6 +750,47 @@ if (scheduleTemplateLoad) {
   ], 'Now & Next module')) {
     return;
   }
+scheduleLibraryToggle?.addEventListener('click', () => {
+  const container = scheduleLibrary.parentElement;
+  container.hidden = !container.hidden;
+});
+
+scheduleTemplateSave?.addEventListener('click', () => {
+  const name = prompt('Template name');
+  if (!name) return;
+  scheduleTemplates.push({ name, items: clone(schedule) });
+  writeStorage(storageKeys.scheduleTemplates, scheduleTemplates);
+  alert('Template saved');
+});
+
+scheduleTemplateLoad?.addEventListener('click', () => {
+  if (!scheduleTemplates.length) {
+    alert('No templates yet');
+    return;
+  }
+  const options = scheduleTemplates.map((t, index) => `${index + 1}. ${t.name}`).join('\n');
+  const chosen = prompt(`Choose template by number:\n${options}`);
+  const idx = Number(chosen) - 1;
+  if (!Number.isInteger(idx) || !scheduleTemplates[idx]) return;
+  schedule = clone(scheduleTemplates[idx].items);
+  writeStorage(storageKeys.schedule, schedule);
+  updateScheduleViews();
+});
+
+// ---------------------- Now & Next ----------------------
+const nowCard = document.getElementById('nowCard');
+const nextCard = document.getElementById('nextCard');
+const nowDoneBtn = document.getElementById('nowDone');
+const nowNextForm = document.getElementById('nowNextForm');
+const nowNextPresets = document.getElementById('nowNextPresets');
+const nowNextLibrary = document.getElementById('nowNextLibrary');
+const nowLibrarySelect = document.getElementById('nowLibrarySelect');
+const nextLibrarySelect = document.getElementById('nextLibrarySelect');
+const applyNowNextLibrary = document.getElementById('applyNowNextLibrary');
+const nowTextInput = document.getElementById('nowText');
+const nextTextInput = document.getElementById('nextText');
+const nowImageInput = document.getElementById('nowImage');
+const nextImageInput = document.getElementById('nextImage');
 let nowNextPresetsData = readStorage(storageKeys.nowNext, defaultData.nowNext);
 let currentNowNext = nowNextPresetsData[0] || null;
 
@@ -592,6 +823,7 @@ function getLibraryCards() {
 }
 
   updateNowNextLibraryOptions = () => {
+function updateNowNextLibraryOptions() {
   if (!nowLibrarySelect || !nextLibrarySelect) {
     nowLibrarySelect = document.getElementById('nowLibrarySelect');
     nextLibrarySelect = document.getElementById('nextLibrarySelect');
@@ -611,6 +843,7 @@ function getLibraryCards() {
   nextLibrarySelect.innerHTML = options;
   if (applyNowNextLibrary) applyNowNextLibrary.disabled = false;
   };
+}
 
 updateNowNextLibraryOptions();
 
@@ -670,6 +903,18 @@ if (applyNowNextLibrary) {
     renderNowNext();
   });
 }
+applyNowNextLibrary?.addEventListener('click', () => {
+  const library = getLibraryCards();
+  const nowChoice = library.find((item) => item.id === nowLibrarySelect.value);
+  const nextChoice = library.find((item) => item.id === nextLibrarySelect.value);
+  if (!nowChoice || !nextChoice) return;
+  currentNowNext = {
+    name: `${nowChoice.text} → ${nextChoice.text}`,
+    now: { text: nowChoice.text, image: nowChoice.image },
+    next: { text: nextChoice.text, image: nextChoice.image }
+  };
+  renderNowNext();
+});
 
 nowDoneBtn.addEventListener('click', () => {
   if (!currentNowNext) return;
@@ -735,6 +980,22 @@ nextCard.addEventListener('keypress', (event) => {
   ], 'Story and reward module')) {
     return;
   }
+const storyList = document.getElementById('storyList');
+const storyForm = document.getElementById('storyForm');
+const rewardForm = document.getElementById('rewardForm');
+const storyTitleInput = document.getElementById('storyTitle');
+const storyTextInput = document.getElementById('storyText');
+const storyStepsContainer = document.getElementById('storySteps');
+const storyGenerateBtn = document.getElementById('storyGenerate');
+const storyMicBtn = document.getElementById('storyMic');
+const rewardStorySelect = document.getElementById('rewardStory');
+const rewardNameInput = document.getElementById('rewardName');
+const rewardTargetSelect = document.getElementById('rewardTarget');
+const rewardImageInput = document.getElementById('rewardImage');
+const rewardPopup = document.getElementById('rewardPopup');
+const rewardPopupImage = document.getElementById('rewardPopupImage');
+const rewardPopupText = document.getElementById('rewardPopupText');
+const rewardClose = document.getElementById('rewardClose');
 let stories = readStorage(storageKeys.stories, defaultData.stories);
 let rewards = readStorage(storageKeys.rewards, defaultData.rewards);
 let rewardProgress = readStorage(storageKeys.rewardProgress, defaultData.rewardProgress);
@@ -743,6 +1004,9 @@ let editingStoryId = null;
 let editingRewardId = null;
 
 hideElement(rewardPopup);
+
+let editingStoryId = null;
+let editingRewardId = null;
 
 function renderStoryList() {
   storyList.innerHTML = '';
@@ -955,6 +1219,16 @@ rewardForm.addEventListener('submit', async (event) => {
   writeStorage(storageKeys.rewards, rewards);
   writeStorage(storageKeys.rewardProgress, rewardProgress);
   writeStorage(storageKeys.rewardCelebrations, rewardCelebrations);
+    }
+  } else {
+    // Ensure only one reward per story
+    rewards = rewards.filter((r) => r.storyId !== storyId);
+    const newReward = { id: `reward-${Date.now()}`, storyId, name, target, image };
+    rewards.push(newReward);
+    rewardProgress[newReward.id] = 0;
+  }
+  writeStorage(storageKeys.rewards, rewards);
+  writeStorage(storageKeys.rewardProgress, rewardProgress);
   renderStoryList();
   editingRewardId = null;
   rewardForm.reset();
@@ -970,6 +1244,7 @@ function addSticker(reward) {
   speak('Great job!');
   const total = rewardProgress[reward.id];
   if (total >= reward.target && rewardCelebrations[reward.id] !== total) {
+  if (rewardProgress[reward.id] >= reward.target) {
     showElement(rewardPopup);
     rewardPopupImage.src = reward.image;
     rewardPopupText.textContent = reward.name;
@@ -1096,6 +1371,11 @@ document.querySelectorAll('[data-close]').forEach((button) => {
   setParentMode(false);
 
   // Accessibility: speak card text on keyboard focus
+// Initially ensure forms hidden in child mode
+setParentMode(false);
+
+// Accessibility: speak card text on keyboard focus
+window.addEventListener('DOMContentLoaded', () => {
   document.body.addEventListener('focusin', (event) => {
     if (event.target.classList.contains('card')) {
       const sentence = event.target.dataset.sentence || event.target.dataset.text;
@@ -1112,3 +1392,7 @@ if (document.readyState === 'loading') {
 } else {
   initialize();
 }
+});
+
+// Provide instructions for extension in console
+console.info('OnYu SEN Communication Tool loaded. Use Parent Mode PIN 1234 to add custom cards.');
