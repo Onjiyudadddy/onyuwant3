@@ -43,3 +43,15 @@ uploads via the FileReader API and stores data in the browser.
 - Use browser dev tools to inspect, test responsive layouts, or simulate touch
   input.
 - Clearing `localStorage` will reset all custom content to defaults.
+
+### Checking for merge conflicts
+
+If GitHub reports unresolved conflicts, run the helper script to double-check the local
+workspace:
+
+```bash
+scripts/check_conflicts.sh
+```
+
+The script exits with a non-zero status and prints any files that still include conflict
+markers or staged conflict entries so you can fix them before pushing.
