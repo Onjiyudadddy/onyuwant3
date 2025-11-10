@@ -211,6 +211,10 @@ function initialize() {
     return true;
   };
 
+  let nowLibrarySelect;
+  let nextLibrarySelect;
+  let applyNowNextLibrary;
+
   function setParentMode(enabled) {
     parentMode = enabled;
     document.querySelectorAll('.parent-only').forEach((el) => {
@@ -580,6 +584,9 @@ if (scheduleTemplateLoad) {
   const nowNextForm = document.getElementById('nowNextForm');
   const nowNextPresets = document.getElementById('nowNextPresets');
   const nowNextLibrary = document.getElementById('nowNextLibrary');
+  nowLibrarySelect = document.getElementById('nowLibrarySelect');
+  nextLibrarySelect = document.getElementById('nextLibrarySelect');
+  applyNowNextLibrary = document.getElementById('applyNowNextLibrary');
   const nowLibrarySelect = document.getElementById('nowLibrarySelect');
   const nextLibrarySelect = document.getElementById('nextLibrarySelect');
   const applyNowNextLibrary = document.getElementById('applyNowNextLibrary');
@@ -673,6 +680,11 @@ function getLibraryCards() {
 }
 
 function updateNowNextLibraryOptions() {
+  if (!nowLibrarySelect || !nextLibrarySelect) {
+    nowLibrarySelect = document.getElementById('nowLibrarySelect');
+    nextLibrarySelect = document.getElementById('nextLibrarySelect');
+    applyNowNextLibrary = document.getElementById('applyNowNextLibrary');
+  }
   if (!nowLibrarySelect || !nextLibrarySelect) return;
   const library = getLibraryCards();
   if (!library.length) {
