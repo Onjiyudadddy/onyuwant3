@@ -16,6 +16,7 @@ const storageKeys = {
   stories: 'onu_stories',
   rewards: 'onu_rewards',
   rewardProgress: 'onu_reward_progress',
+  rewardCelebrations: 'onu_reward_celebrations',
   pin: 'onu_parent_pin'
 };
 
@@ -42,6 +43,8 @@ const defaultData = {
   nowNext: [],
   stories: [],
   rewards: [],
+  rewardProgress: {},
+  rewardCelebrations: {}
   rewardProgress: {}
 };
 
@@ -590,6 +593,12 @@ const rewardClose = document.getElementById('rewardClose');
 let stories = readStorage(storageKeys.stories, defaultData.stories);
 let rewards = readStorage(storageKeys.rewards, defaultData.rewards);
 let rewardProgress = readStorage(storageKeys.rewardProgress, defaultData.rewardProgress);
+let rewardCelebrations = readStorage(storageKeys.rewardCelebrations, defaultData.rewardCelebrations);
+let editingStoryId = null;
+let editingRewardId = null;
+
+hideElement(rewardPopup);
+
 let editingStoryId = null;
 let editingRewardId = null;
 
@@ -786,6 +795,24 @@ rewardForm.addEventListener('submit', async (event) => {
     if (idx !== -1) {
       rewards[idx] = { id: editingRewardId, storyId, name, target, image };
       rewardProgress[editingRewardId] = Math.min(rewardProgress[editingRewardId] || 0, target);
+      rewardCelebrations[editingRewardId] = Math.min(rewardCelebrations[editingRewardId] || 0, target);
+    }
+  } else {
+    // Ensure only one reward per story
+    const removedRewards = rewards.filter((r) => r.storyId === storyId);
+    rewards = rewards.filter((r) => r.storyId !== storyId);
+    removedRewards.forEach((existing) => {
+      delete rewardProgress[existing.id];
+      delete rewardCelebrations[existing.id];
+    });
+    const newReward = { id: `reward-${Date.now()}`, storyId, name, target, image };
+    rewards.push(newReward);
+    rewardProgress[newReward.id] = 0;
+    rewardCelebrations[newReward.id] = 0;
+  }
+  writeStorage(storageKeys.rewards, rewards);
+  writeStorage(storageKeys.rewardProgress, rewardProgress);
+  writeStorage(storageKeys.rewardCelebrations, rewardCelebrations);
     }
   } else {
     // Ensure only one reward per story
@@ -809,11 +836,15 @@ function addSticker(reward) {
   writeStorage(storageKeys.rewardProgress, rewardProgress);
   renderStoryList();
   speak('Great job!');
+  const total = rewardProgress[reward.id];
+  if (total >= reward.target && rewardCelebrations[reward.id] !== total) {
   if (rewardProgress[reward.id] >= reward.target) {
     showElement(rewardPopup);
     rewardPopupImage.src = reward.image;
     rewardPopupText.textContent = reward.name;
     setTimeout(() => speak('You earned your reward!', { queue: true }), 600);
+    rewardCelebrations[reward.id] = total;
+    writeStorage(storageKeys.rewardCelebrations, rewardCelebrations);
   }
 }
 
@@ -822,6 +853,8 @@ function resetReward(reward) {
   if (!confirm('Reset stickers for this reward?')) return;
   rewardProgress[reward.id] = 0;
   writeStorage(storageKeys.rewardProgress, rewardProgress);
+  rewardCelebrations[reward.id] = 0;
+  writeStorage(storageKeys.rewardCelebrations, rewardCelebrations);
   renderStoryList();
 }
 
@@ -861,6 +894,10 @@ storyList.addEventListener('click', (event) => {
 rewardClose.addEventListener('click', () => hideElement(rewardPopup));
 rewardPopup.addEventListener('click', (event) => {
   if (event.target === rewardPopup) hideElement(rewardPopup);
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') hideElement(rewardPopup);
 });
 
 // ---------------------- Microphone for Story input ----------------------
