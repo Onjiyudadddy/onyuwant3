@@ -185,6 +185,46 @@ function ensurePin() {
   }
 }
 
+function initialize() {
+  ensurePin();
+
+  // ---------------------- Parent Mode ----------------------
+  let parentMode = false;
+  const parentToggleBtn = document.getElementById('parentToggle');
+  const pinModal = document.getElementById('pinModal');
+  const pinInput = document.getElementById('pinInput');
+  const pinSubmit = document.getElementById('pinSubmit');
+  const pinCancel = document.getElementById('pinCancel');
+  const modeNotice = document.getElementById('modeNotice');
+
+  if (!parentToggleBtn || !pinModal || !pinInput || !pinSubmit || !pinCancel || !modeNotice) {
+    console.error('Missing core UI elements, unable to initialise app.');
+    return;
+  }
+
+  const requireElements = (entries, context) => {
+    const missing = entries.filter(([, el]) => !el).map(([name]) => name);
+    if (missing.length) {
+      console.error(`Missing ${context} elements: ${missing.join(', ')}`);
+      return false;
+    }
+    return true;
+  };
+
+  function setParentMode(enabled) {
+    parentMode = enabled;
+    document.querySelectorAll('.parent-only').forEach((el) => {
+      el.hidden = !enabled;
+    });
+    document.querySelectorAll('.child-only').forEach((el) => {
+      el.hidden = enabled;
+    });
+    modeNotice.textContent = enabled ? 'Parent Mode Active' : 'Child Mode Active';
+    parentToggleBtn.textContent = enabled ? 'Exit Parent Mode' : 'Parent Mode';
+    if (!enabled) {
+      hideElement(pinModal);
+    }
+  }
 // ---------------------- Parent Mode ----------------------
 let parentMode = false;
 const parentToggleBtn = document.getElementById('parentToggle');
@@ -244,6 +284,19 @@ pinModal.addEventListener('click', (event) => {
 });
 
 // ---------------------- Emotion Board ----------------------
+  const emotionBoard = document.getElementById('emotionBoard');
+  const emotionForm = document.getElementById('emotionForm');
+  const emotionTextInput = document.getElementById('emotionText');
+  const emotionImageInput = document.getElementById('emotionImage');
+  if (!requireElements([
+    ['emotionBoard', emotionBoard],
+    ['emotionForm', emotionForm],
+    ['emotionTextInput', emotionTextInput],
+    ['emotionImageInput', emotionImageInput],
+  ], 'Emotion board')) {
+    return;
+  }
+let emotions = ensureDefaultCards(storageKeys.emotions, defaultData.emotions, { type: 'emotion' });
 const emotionBoard = document.getElementById('emotionBoard');
 const emotionForm = document.getElementById('emotionForm');
 const emotionTextInput = document.getElementById('emotionText');
@@ -289,6 +342,22 @@ emotionForm.addEventListener('submit', async (event) => {
 });
 
 // ---------------------- Needs Board ----------------------
+  const needsBoard = document.getElementById('needsBoard');
+  const needsForm = document.getElementById('needsForm');
+  const needTextInput = document.getElementById('needText');
+  const needCategorySelect = document.getElementById('needCategory');
+  const needImageInput = document.getElementById('needImage');
+  const needsCategoryFilter = document.getElementById('needsCategory');
+  const needsSentence = document.getElementById('needsSentence');
+  if (!requireElements([
+    ['needsBoard', needsBoard],
+    ['needsForm', needsForm],
+    ['needTextInput', needTextInput],
+    ['needCategorySelect', needCategorySelect],
+    ['needImageInput', needImageInput],
+  ], 'Needs board')) {
+    return;
+  }
 const needsBoard = document.getElementById('needsBoard');
 const needsForm = document.getElementById('needsForm');
 const needTextInput = document.getElementById('needText');
@@ -359,6 +428,23 @@ if (needsCategoryFilter) {
     renderNeeds(needsCategoryFilter.value);
   });
 }
+
+// ---------------------- Schedule Module ----------------------
+  const scheduleChildView = document.getElementById('scheduleChildView');
+  const scheduleParentView = document.getElementById('scheduleParentView');
+  const scheduleDrop = document.getElementById('scheduleDrop');
+  const scheduleLibrary = document.getElementById('scheduleLibrary');
+  const scheduleLibraryToggle = document.getElementById('scheduleLibraryToggle');
+  const scheduleTemplateSave = document.getElementById('scheduleTemplateSave');
+  const scheduleTemplateLoad = document.getElementById('scheduleTemplateLoad');
+  if (!requireElements([
+    ['scheduleChildView', scheduleChildView],
+    ['scheduleParentView', scheduleParentView],
+    ['scheduleDrop', scheduleDrop],
+    ['scheduleLibrary', scheduleLibrary],
+  ], "Schedule module")) {
+    return;
+  }
 needsCategoryFilter.addEventListener('change', () => {
   renderNeeds(needsCategoryFilter.value);
 });
@@ -486,6 +572,34 @@ if (scheduleTemplateLoad) {
     updateScheduleViews();
   });
 }
+
+// ---------------------- Now & Next ----------------------
+  const nowCard = document.getElementById('nowCard');
+  const nextCard = document.getElementById('nextCard');
+  const nowDoneBtn = document.getElementById('nowDone');
+  const nowNextForm = document.getElementById('nowNextForm');
+  const nowNextPresets = document.getElementById('nowNextPresets');
+  const nowNextLibrary = document.getElementById('nowNextLibrary');
+  const nowLibrarySelect = document.getElementById('nowLibrarySelect');
+  const nextLibrarySelect = document.getElementById('nextLibrarySelect');
+  const applyNowNextLibrary = document.getElementById('applyNowNextLibrary');
+  const nowTextInput = document.getElementById('nowText');
+  const nextTextInput = document.getElementById('nextText');
+  const nowImageInput = document.getElementById('nowImage');
+  const nextImageInput = document.getElementById('nextImage');
+  if (!requireElements([
+    ['nowCard', nowCard],
+    ['nextCard', nextCard],
+    ['nowNextForm', nowNextForm],
+    ['nowNextPresets', nowNextPresets],
+    ['nowLibrarySelect', nowLibrarySelect],
+    ['nextLibrarySelect', nextLibrarySelect],
+    ['applyNowNextLibrary', applyNowNextLibrary],
+    ['nowTextInput', nowTextInput],
+    ['nextTextInput', nextTextInput],
+  ], 'Now & Next module')) {
+    return;
+  }
 scheduleLibraryToggle?.addEventListener('click', () => {
   const container = scheduleLibrary.parentElement;
   container.hidden = !container.hidden;
@@ -674,6 +788,41 @@ nextCard.addEventListener('keypress', (event) => {
 });
 
 // ---------------------- Story + Reward System ----------------------
+  const storyList = document.getElementById('storyList');
+  const storyForm = document.getElementById('storyForm');
+  const rewardForm = document.getElementById('rewardForm');
+  const storyTitleInput = document.getElementById('storyTitle');
+  const storyTextInput = document.getElementById('storyText');
+  const storyStepsContainer = document.getElementById('storySteps');
+  const storyGenerateBtn = document.getElementById('storyGenerate');
+  const storyMicBtn = document.getElementById('storyMic');
+  const rewardStorySelect = document.getElementById('rewardStory');
+  const rewardNameInput = document.getElementById('rewardName');
+  const rewardTargetSelect = document.getElementById('rewardTarget');
+  const rewardImageInput = document.getElementById('rewardImage');
+  const rewardPopup = document.getElementById('rewardPopup');
+  const rewardPopupImage = document.getElementById('rewardPopupImage');
+  const rewardPopupText = document.getElementById('rewardPopupText');
+  const rewardClose = document.getElementById('rewardClose');
+  if (!requireElements([
+    ['storyList', storyList],
+    ['storyForm', storyForm],
+    ['storyTitleInput', storyTitleInput],
+    ['storyTextInput', storyTextInput],
+    ['storyStepsContainer', storyStepsContainer],
+    ['storyGenerateBtn', storyGenerateBtn],
+    ['storyMicBtn', storyMicBtn],
+    ['rewardForm', rewardForm],
+    ['rewardStorySelect', rewardStorySelect],
+    ['rewardNameInput', rewardNameInput],
+    ['rewardTargetSelect', rewardTargetSelect],
+    ['rewardPopup', rewardPopup],
+    ['rewardPopupImage', rewardPopupImage],
+    ['rewardPopupText', rewardPopupText],
+    ['rewardClose', rewardClose],
+  ], 'Story and reward module')) {
+    return;
+  }
 const storyList = document.getElementById('storyList');
 const storyForm = document.getElementById('storyForm');
 const rewardForm = document.getElementById('rewardForm');
@@ -1061,6 +1210,10 @@ document.querySelectorAll('[data-close]').forEach((button) => {
   }
 });
 
+  // Initially ensure forms hidden in child mode
+  setParentMode(false);
+
+  // Accessibility: speak card text on keyboard focus
 // Initially ensure forms hidden in child mode
 setParentMode(false);
 
@@ -1072,6 +1225,16 @@ window.addEventListener('DOMContentLoaded', () => {
       if (sentence) speak(sentence);
     }
   });
+
+  // Provide instructions for extension in console
+  console.info('OnYu SEN Communication Tool loaded. Use Parent Mode PIN 1234 to add custom cards.');
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initialize);
+} else {
+  initialize();
+}
 });
 
 // Provide instructions for extension in console
