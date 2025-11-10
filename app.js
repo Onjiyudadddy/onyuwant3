@@ -27,6 +27,10 @@ const defaultData = {
     { id: 'angry', text: 'Angry', sentence: 'I feel angry.', image: 'assets/placeholder-angry.svg' },
     { id: 'tired', text: 'Tired', sentence: 'I feel tired.', image: 'assets/placeholder-tired.svg' },
     { id: 'excited', text: 'Excited', sentence: 'I feel excited.', image: 'assets/placeholder-excited.svg' },
+    { id: 'worried', text: 'Worried', sentence: 'I feel worried.', image: 'assets/placeholder-worried.svg' },
+    { id: 'calm', text: 'Calm', sentence: 'I feel calm.', image: 'assets/placeholder-calm.svg' },
+    { id: 'scared', text: 'Scared', sentence: 'I feel scared.', image: 'assets/placeholder-scared.svg' },
+    { id: 'frustrated', text: 'Frustrated', sentence: 'I feel frustrated.', image: 'assets/placeholder-frustrated.svg' }
     { id: 'worried', text: 'Worried', sentence: 'I feel worried.', image: 'assets/placeholder-worried.svg' }
   ],
   needs: [
@@ -36,6 +40,10 @@ const defaultData = {
     { id: 'break', text: 'Break', sentence: 'I want a break.', category: 'Activities', image: 'assets/placeholder-break.svg' },
     { id: 'help', text: 'Help', sentence: 'I want help.', category: 'Activities', image: 'assets/placeholder-help.svg' },
     { id: 'play', text: 'Play', sentence: 'I want to play.', category: 'Activities', image: 'assets/placeholder-play.svg' },
+    { id: 'sleep', text: 'Sleep', sentence: 'I want to sleep.', category: 'Activities', image: 'assets/placeholder-sleep.svg' },
+    { id: 'outside', text: 'Go Outside', sentence: 'I want to go outside.', category: 'Places', image: 'assets/placeholder-outside.svg' },
+    { id: 'music', text: 'Music', sentence: 'I want music.', category: 'Activities', image: 'assets/placeholder-music.svg' },
+    { id: 'quiet', text: 'Quiet Time', sentence: 'I want quiet time.', category: 'Activities', image: 'assets/placeholder-quiet.svg' }
     { id: 'sleep', text: 'Sleep', sentence: 'I want to sleep.', category: 'Activities', image: 'assets/placeholder-sleep.svg' }
   ],
   schedule: [],
@@ -123,6 +131,11 @@ function createCard({ text, image, sentence }, onClick) {
 }
 
 function showElement(el) {
+  if (el) el.hidden = false;
+}
+
+function hideElement(el) {
+  if (el) el.hidden = true;
   el.hidden = false;
 }
 
@@ -132,6 +145,37 @@ function hideElement(el) {
 
 function toggleClass(element, className, condition) {
   element.classList.toggle(className, condition);
+}
+
+function ensureDefaultCards(key, defaults, { type } = {}) {
+  let items = readStorage(key, defaults);
+  let changed = false;
+  if (!Array.isArray(items) || items.length === 0) {
+    items = clone(defaults);
+    changed = true;
+  } else {
+    items = items.map((item) => {
+      const normalized = { ...item };
+      if (!normalized.id && normalized.text) {
+        normalized.id = `${normalized.text.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+        changed = true;
+      }
+      if (!normalized.sentence && normalized.text) {
+        const base = normalized.text.toLowerCase();
+        normalized.sentence = type === 'emotion' ? `I feel ${base}.` : `I want ${base}.`;
+        changed = true;
+      }
+      if (!normalized.image) {
+        normalized.image = 'assets/placeholder-generic.svg';
+        changed = true;
+      }
+      return normalized;
+    });
+  }
+  if (changed) {
+    writeStorage(key, items);
+  }
+  return items;
 }
 
 function ensurePin() {
@@ -204,6 +248,7 @@ const emotionBoard = document.getElementById('emotionBoard');
 const emotionForm = document.getElementById('emotionForm');
 const emotionTextInput = document.getElementById('emotionText');
 const emotionImageInput = document.getElementById('emotionImage');
+let emotions = ensureDefaultCards(storageKeys.emotions, defaultData.emotions, { type: 'emotion' });
 let emotions = readStorage(storageKeys.emotions, defaultData.emotions);
 
 function renderEmotions() {
@@ -251,6 +296,10 @@ const needCategorySelect = document.getElementById('needCategory');
 const needImageInput = document.getElementById('needImage');
 const needsCategoryFilter = document.getElementById('needsCategory');
 const needsSentence = document.getElementById('needsSentence');
+let needs = ensureDefaultCards(storageKeys.needs, defaultData.needs, { type: 'need' });
+
+function populateNeedCategories() {
+  if (!needsCategoryFilter) return;
 let needs = readStorage(storageKeys.needs, defaultData.needs);
 
 function populateNeedCategories() {
@@ -305,6 +354,11 @@ needsForm.addEventListener('submit', async (event) => {
   hideElement(needsForm);
 });
 
+if (needsCategoryFilter) {
+  needsCategoryFilter.addEventListener('change', () => {
+    renderNeeds(needsCategoryFilter.value);
+  });
+}
 needsCategoryFilter.addEventListener('change', () => {
   renderNeeds(needsCategoryFilter.value);
 });
@@ -400,6 +454,38 @@ scheduleChildView.addEventListener('click', (event) => {
   }
 });
 
+if (scheduleLibraryToggle) {
+  scheduleLibraryToggle.addEventListener('click', () => {
+    const container = scheduleLibrary.parentElement;
+    container.hidden = !container.hidden;
+  });
+}
+
+if (scheduleTemplateSave) {
+  scheduleTemplateSave.addEventListener('click', () => {
+    const name = prompt('Template name');
+    if (!name) return;
+    scheduleTemplates.push({ name, items: clone(schedule) });
+    writeStorage(storageKeys.scheduleTemplates, scheduleTemplates);
+    alert('Template saved');
+  });
+}
+
+if (scheduleTemplateLoad) {
+  scheduleTemplateLoad.addEventListener('click', () => {
+    if (!scheduleTemplates.length) {
+      alert('No templates yet');
+      return;
+    }
+    const options = scheduleTemplates.map((t, index) => `${index + 1}. ${t.name}`).join('\n');
+    const chosen = prompt(`Choose template by number:\n${options}`);
+    const idx = Number(chosen) - 1;
+    if (!Number.isInteger(idx) || !scheduleTemplates[idx]) return;
+    schedule = clone(scheduleTemplates[idx].items);
+    writeStorage(storageKeys.schedule, schedule);
+    updateScheduleViews();
+  });
+}
 scheduleLibraryToggle?.addEventListener('click', () => {
   const container = scheduleLibrary.parentElement;
   container.hidden = !container.hidden;
@@ -532,6 +618,20 @@ nowNextPresets.addEventListener('click', (event) => {
   }
 });
 
+if (applyNowNextLibrary) {
+  applyNowNextLibrary.addEventListener('click', () => {
+    const library = getLibraryCards();
+    const nowChoice = library.find((item) => item.id === nowLibrarySelect.value);
+    const nextChoice = library.find((item) => item.id === nextLibrarySelect.value);
+    if (!nowChoice || !nextChoice) return;
+    currentNowNext = {
+      name: `${nowChoice.text} → ${nextChoice.text}`,
+      now: { text: nowChoice.text, image: nowChoice.image },
+      next: { text: nextChoice.text, image: nextChoice.image }
+    };
+    renderNowNext();
+  });
+}
 applyNowNextLibrary?.addEventListener('click', () => {
   const library = getLibraryCards();
   const nowChoice = library.find((item) => item.id === nowLibrarySelect.value);
