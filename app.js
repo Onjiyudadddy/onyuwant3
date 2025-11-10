@@ -31,6 +31,7 @@ const defaultData = {
     { id: 'calm', text: 'Calm', sentence: 'I feel calm.', image: 'assets/placeholder-calm.svg' },
     { id: 'scared', text: 'Scared', sentence: 'I feel scared.', image: 'assets/placeholder-scared.svg' },
     { id: 'frustrated', text: 'Frustrated', sentence: 'I feel frustrated.', image: 'assets/placeholder-frustrated.svg' }
+    { id: 'worried', text: 'Worried', sentence: 'I feel worried.', image: 'assets/placeholder-worried.svg' }
   ],
   needs: [
     { id: 'toilet', text: 'Toilet', sentence: 'I want the toilet.', category: 'Places', image: 'assets/placeholder-toilet.svg' },
@@ -43,6 +44,7 @@ const defaultData = {
     { id: 'outside', text: 'Go Outside', sentence: 'I want to go outside.', category: 'Places', image: 'assets/placeholder-outside.svg' },
     { id: 'music', text: 'Music', sentence: 'I want music.', category: 'Activities', image: 'assets/placeholder-music.svg' },
     { id: 'quiet', text: 'Quiet Time', sentence: 'I want quiet time.', category: 'Activities', image: 'assets/placeholder-quiet.svg' }
+    { id: 'sleep', text: 'Sleep', sentence: 'I want to sleep.', category: 'Activities', image: 'assets/placeholder-sleep.svg' }
   ],
   schedule: [],
   scheduleTemplates: [],
@@ -51,6 +53,7 @@ const defaultData = {
   rewards: [],
   rewardProgress: {},
   rewardCelebrations: {}
+  rewardProgress: {}
 };
 
 const iconSuggestions = {
@@ -133,6 +136,11 @@ function showElement(el) {
 
 function hideElement(el) {
   if (el) el.hidden = true;
+  el.hidden = false;
+}
+
+function hideElement(el) {
+  el.hidden = true;
 }
 
 function toggleClass(element, className, condition) {
@@ -241,6 +249,7 @@ const emotionForm = document.getElementById('emotionForm');
 const emotionTextInput = document.getElementById('emotionText');
 const emotionImageInput = document.getElementById('emotionImage');
 let emotions = ensureDefaultCards(storageKeys.emotions, defaultData.emotions, { type: 'emotion' });
+let emotions = readStorage(storageKeys.emotions, defaultData.emotions);
 
 function renderEmotions() {
   emotionBoard.innerHTML = '';
@@ -291,6 +300,9 @@ let needs = ensureDefaultCards(storageKeys.needs, defaultData.needs, { type: 'ne
 
 function populateNeedCategories() {
   if (!needsCategoryFilter) return;
+let needs = readStorage(storageKeys.needs, defaultData.needs);
+
+function populateNeedCategories() {
   const categories = Array.from(new Set(needs.map((n) => n.category)));
   needsCategoryFilter.innerHTML = '<option value="all">All</option>' + categories.map((c) => `<option value="${c}">${c}</option>`).join('');
 }
@@ -347,6 +359,9 @@ if (needsCategoryFilter) {
     renderNeeds(needsCategoryFilter.value);
   });
 }
+needsCategoryFilter.addEventListener('change', () => {
+  renderNeeds(needsCategoryFilter.value);
+});
 
 // ---------------------- Schedule Module ----------------------
 const scheduleChildView = document.getElementById('scheduleChildView');
@@ -471,6 +486,32 @@ if (scheduleTemplateLoad) {
     updateScheduleViews();
   });
 }
+scheduleLibraryToggle?.addEventListener('click', () => {
+  const container = scheduleLibrary.parentElement;
+  container.hidden = !container.hidden;
+});
+
+scheduleTemplateSave?.addEventListener('click', () => {
+  const name = prompt('Template name');
+  if (!name) return;
+  scheduleTemplates.push({ name, items: clone(schedule) });
+  writeStorage(storageKeys.scheduleTemplates, scheduleTemplates);
+  alert('Template saved');
+});
+
+scheduleTemplateLoad?.addEventListener('click', () => {
+  if (!scheduleTemplates.length) {
+    alert('No templates yet');
+    return;
+  }
+  const options = scheduleTemplates.map((t, index) => `${index + 1}. ${t.name}`).join('\n');
+  const chosen = prompt(`Choose template by number:\n${options}`);
+  const idx = Number(chosen) - 1;
+  if (!Number.isInteger(idx) || !scheduleTemplates[idx]) return;
+  schedule = clone(scheduleTemplates[idx].items);
+  writeStorage(storageKeys.schedule, schedule);
+  updateScheduleViews();
+});
 
 // ---------------------- Now & Next ----------------------
 const nowCard = document.getElementById('nowCard');
@@ -591,6 +632,18 @@ if (applyNowNextLibrary) {
     renderNowNext();
   });
 }
+applyNowNextLibrary?.addEventListener('click', () => {
+  const library = getLibraryCards();
+  const nowChoice = library.find((item) => item.id === nowLibrarySelect.value);
+  const nextChoice = library.find((item) => item.id === nextLibrarySelect.value);
+  if (!nowChoice || !nextChoice) return;
+  currentNowNext = {
+    name: `${nowChoice.text} → ${nextChoice.text}`,
+    now: { text: nowChoice.text, image: nowChoice.image },
+    next: { text: nextChoice.text, image: nextChoice.image }
+  };
+  renderNowNext();
+});
 
 nowDoneBtn.addEventListener('click', () => {
   if (!currentNowNext) return;
@@ -645,6 +698,9 @@ let editingStoryId = null;
 let editingRewardId = null;
 
 hideElement(rewardPopup);
+
+let editingStoryId = null;
+let editingRewardId = null;
 
 function renderStoryList() {
   storyList.innerHTML = '';
@@ -857,6 +913,16 @@ rewardForm.addEventListener('submit', async (event) => {
   writeStorage(storageKeys.rewards, rewards);
   writeStorage(storageKeys.rewardProgress, rewardProgress);
   writeStorage(storageKeys.rewardCelebrations, rewardCelebrations);
+    }
+  } else {
+    // Ensure only one reward per story
+    rewards = rewards.filter((r) => r.storyId !== storyId);
+    const newReward = { id: `reward-${Date.now()}`, storyId, name, target, image };
+    rewards.push(newReward);
+    rewardProgress[newReward.id] = 0;
+  }
+  writeStorage(storageKeys.rewards, rewards);
+  writeStorage(storageKeys.rewardProgress, rewardProgress);
   renderStoryList();
   editingRewardId = null;
   rewardForm.reset();
@@ -872,6 +938,7 @@ function addSticker(reward) {
   speak('Great job!');
   const total = rewardProgress[reward.id];
   if (total >= reward.target && rewardCelebrations[reward.id] !== total) {
+  if (rewardProgress[reward.id] >= reward.target) {
     showElement(rewardPopup);
     rewardPopupImage.src = reward.image;
     rewardPopupText.textContent = reward.name;
