@@ -145,8 +145,16 @@ function toggleClass(element, className, condition) {
 }
 
 function ensureDefaultCards(key, defaults, { type } = {}) {
+  let hasStoredValue = false;
+  try {
+    hasStoredValue = Boolean(localStorage.getItem(key));
+  } catch (error) {
+    console.warn('Storage availability check failed', key, error);
+  }
+
   let items = readStorage(key, defaults);
-  let changed = false;
+  let changed = !hasStoredValue;
+
   if (!Array.isArray(items) || items.length === 0) {
     items = clone(defaults);
     changed = true;
@@ -169,9 +177,11 @@ function ensureDefaultCards(key, defaults, { type } = {}) {
       return normalized;
     });
   }
+
   if (changed) {
     writeStorage(key, items);
   }
+
   return items;
 }
 
