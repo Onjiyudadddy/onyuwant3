@@ -1,0 +1,8 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#FFF4C8'/>
+  <rect x='58' y='76' width='84' height='88' rx='16' fill='#FFFFFF' stroke='#B57A00' stroke-width='6'/>
+  <path d='M100 60 C88 44 66 44 66 64 C66 80 84 84 100 92 C116 84 134 80 134 64 C134 44 112 44 100 60Z' fill='#FFD45A' stroke='#B57A00' stroke-width='6'/>
+  <path d='M100 76 V164' stroke='#B57A00' stroke-width='10'/>
+  <path d='M58 116 H142' stroke='#B57A00' stroke-width='10'/>
+  <text x='100' y='182' font-family="'Poppins', 'Arial', sans-serif" font-size='22' text-anchor='middle' fill='#B57A00'>Reward</text>
+</svg>

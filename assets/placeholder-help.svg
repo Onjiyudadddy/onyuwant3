@@ -1,0 +1,7 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#FFF0CC'/>
+  <path d='M68 120 C68 96 88 78 100 78 C112 78 132 96 132 120' fill='#FFE0A3' stroke='#81551C' stroke-width='6'/>
+  <path d='M80 118 C80 108 88 100 100 100 C112 100 120 108 120 118 L120 140 H80Z' fill='#FFFFFF' stroke='#81551C' stroke-width='6'/>
+  <path d='M70 134 L70 150 C70 158 76 164 84 164 H116 C124 164 130 158 130 150 L130 134' stroke='#81551C' stroke-width='6' fill='none' stroke-linecap='round'/>
+  <text x='100' y='182' font-family="'Poppins', 'Arial', sans-serif" font-size='22' text-anchor='middle' fill='#81551C'>Help</text>
+</svg>

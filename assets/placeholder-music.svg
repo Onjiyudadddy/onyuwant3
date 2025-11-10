@@ -1,0 +1,6 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#F3E3FF'/>
+  <path d='M92 60 H134 V124 C134 134 126 142 116 142 C106 142 98 134 98 124 C98 116 102 108 110 104 V76 H92 Z' fill='#8742C4'/>
+  <circle cx='82' cy='126' r='16' fill='#8742C4'/>
+  <text x='100' y='182' font-family="'Poppins', 'Arial', sans-serif" font-size='22' text-anchor='middle' fill='#642A9B'>Music</text>
+</svg>

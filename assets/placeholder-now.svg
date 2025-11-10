@@ -1,0 +1,7 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#E0F7F1'/>
+  <circle cx='100' cy='100' r='46' fill='#FFFFFF' stroke='#1A7A68' stroke-width='6'/>
+  <path d='M100 70 L100 116' stroke='#1A7A68' stroke-width='10' stroke-linecap='round'/>
+  <path d='M84 96 L100 120 L116 96 Z' fill='#1A7A68'/>
+  <text x='100' y='182' font-family="'Poppins', 'Arial', sans-serif" font-size='22' text-anchor='middle' fill='#1A7A68'>Now</text>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#D7C6FF'/>
+  <circle cx='100' cy='88' r='58' fill='#F4ECFF' stroke='#342E4C' stroke-width='4'/>
+  <path d='M70 80 Q80 88 90 80' stroke='#342E4C' stroke-width='6' stroke-linecap='round' fill='none'/>
+  <path d='M110 80 Q120 88 130 80' stroke='#342E4C' stroke-width='6' stroke-linecap='round' fill='none'/>
+  <path d='M76 122 Q100 110 124 122' fill='none' stroke='#342E4C' stroke-width='6' stroke-linecap='round'/>
+  <text x='100' y='168' font-family="'Poppins', 'Arial', sans-serif" font-size='26' text-anchor='middle' fill='#342E4C'>Tired</text>
+</svg>

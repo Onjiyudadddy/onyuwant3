@@ -1,0 +1,8 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#CDEFD6'/>
+  <circle cx='100' cy='88' r='58' fill='#E9F9EE' stroke='#2F4635' stroke-width='4'/>
+  <path d='M74 84 Q82 78 90 84' stroke='#2F4635' stroke-width='5' stroke-linecap='round' fill='none'/>
+  <path d='M110 84 Q118 78 126 84' stroke='#2F4635' stroke-width='5' stroke-linecap='round' fill='none'/>
+  <path d='M76 112 Q100 130 124 112' fill='none' stroke='#2F4635' stroke-width='5' stroke-linecap='round'/>
+  <text x='100' y='168' font-family="'Poppins', 'Arial', sans-serif" font-size='26' text-anchor='middle' fill='#2F4635'>Calm</text>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#FFB3A0'/>
+  <circle cx='100' cy='88' r='58' fill='#FFE1D6' stroke='#402020' stroke-width='4'/>
+  <path d='M70 70 L88 78' stroke='#402020' stroke-width='7' stroke-linecap='round'/>
+  <path d='M130 70 L112 78' stroke='#402020' stroke-width='7' stroke-linecap='round'/>
+  <circle cx='82' cy='90' r='8' fill='#402020'/>
+  <circle cx='118' cy='90' r='8' fill='#402020'/>
+  <path d='M74 122 Q100 108 126 122' fill='none' stroke='#402020' stroke-width='7' stroke-linecap='round'/>
+  <text x='100' y='168' font-family="'Poppins', 'Arial', sans-serif" font-size='26' text-anchor='middle' fill='#402020'>Angry</text>
+</svg>

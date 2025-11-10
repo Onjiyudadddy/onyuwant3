@@ -1,0 +1,8 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#D4F1FF'/>
+  <circle cx='100' cy='88' r='58' fill='#EFF9FF' stroke='#1F3A4D' stroke-width='4'/>
+  <circle cx='82' cy='82' r='9' fill='#1F3A4D'/>
+  <circle cx='118' cy='82' r='9' fill='#1F3A4D'/>
+  <circle cx='100' cy='110' r='14' fill='none' stroke='#1F3A4D' stroke-width='6'/>
+  <text x='100' y='168' font-family="'Poppins', 'Arial', sans-serif" font-size='26' text-anchor='middle' fill='#1F3A4D'>Scared</text>
+</svg>

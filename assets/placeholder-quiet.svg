@@ -1,0 +1,9 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#E7F0FF'/>
+  <circle cx='100' cy='88' r='54' fill='#FFFFFF' stroke='#3F4C63' stroke-width='6'/>
+  <circle cx='82' cy='82' r='8' fill='#3F4C63'/>
+  <circle cx='118' cy='82' r='8' fill='#3F4C63'/>
+  <path d='M94 94 L106 134' stroke='#3F4C63' stroke-width='8' stroke-linecap='round'/>
+  <path d='M88 124 H112' stroke='#3F4C63' stroke-width='6' stroke-linecap='round'/>
+  <text x='100' y='182' font-family="'Poppins', 'Arial', sans-serif" font-size='22' text-anchor='middle' fill='#3F4C63'>Quiet</text>
+</svg>

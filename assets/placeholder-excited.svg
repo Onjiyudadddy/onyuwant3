@@ -1,0 +1,10 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#FFD6A5'/>
+  <circle cx='100' cy='88' r='58' fill='#FFF2DD' stroke='#5A3115' stroke-width='4'/>
+  <polygon points='80,76 84,88 72,88' fill='#F38C15'/>
+  <polygon points='120,76 124,88 112,88' fill='#F38C15'/>
+  <circle cx='80' cy='88' r='7' fill='#5A3115'/>
+  <circle cx='120' cy='88' r='7' fill='#5A3115'/>
+  <path d='M72 106 Q100 140 128 106' fill='none' stroke='#F38C15' stroke-width='7' stroke-linecap='round'/>
+  <text x='100' y='168' font-family="'Poppins', 'Arial', sans-serif" font-size='26' text-anchor='middle' fill='#5A3115'>Excited</text>
+</svg>

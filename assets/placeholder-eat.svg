@@ -1,0 +1,9 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#FFE4C7'/>
+  <circle cx='100' cy='96' r='54' fill='#FFFFFF' stroke='#6A4028' stroke-width='6'/>
+  <circle cx='100' cy='96' r='30' fill='#F4B266'/>
+  <rect x='54' y='56' width='10' height='80' rx='4' fill='#6A4028'/>
+  <rect x='136' y='56' width='10' height='80' rx='4' fill='#6A4028'/>
+  <rect x='48' y='84' width='22' height='10' fill='#6A4028'/>
+  <text x='100' y='182' font-family="'Poppins', 'Arial', sans-serif" font-size='22' text-anchor='middle' fill='#6A4028'>Eat</text>
+</svg>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnYu SEN Communication Tool</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>OnYu Communication</h1>
+    <button id="parentToggle" class="pin-btn" aria-label="Toggle Parent Mode">Parent Mode</button>
+  </header>
+
+  <main>
+    <section id="modeNotice" class="mode-notice" aria-live="polite">Child Mode Active</section>
+    <noscript class="noscript-warning">Please enable JavaScript to use interactive features.</noscript>
+
+    <section class="module" id="emotionModule">
+      <div class="module-header">
+        <h2>Emotion Board</h2>
+        <button class="add-btn parent-only" data-target="emotion">+ Add Emotion</button>
+      </div>
+      <div id="emotionBoard" class="card-grid">
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-happy.svg" alt="Happy">
+          <p>Happy</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-sad.svg" alt="Sad">
+          <p>Sad</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-angry.svg" alt="Angry">
+          <p>Angry</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-tired.svg" alt="Tired">
+          <p>Tired</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-excited.svg" alt="Excited">
+          <p>Excited</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-worried.svg" alt="Worried">
+          <p>Worried</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-calm.svg" alt="Calm">
+          <p>Calm</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-scared.svg" alt="Scared">
+          <p>Scared</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-frustrated.svg" alt="Frustrated">
+          <p>Frustrated</p>
+        </div>
+      </div>
+      <form id="emotionForm" class="card-form parent-only" hidden>
+        <h3>Add / Edit Emotion</h3>
+        <label>
+          Emotion text
+          <input type="text" id="emotionText" required>
+        </label>
+        <label>
+          Upload image
+          <input type="file" id="emotionImage" accept="image/*">
+        </label>
+        <button type="submit" class="primary">Save Emotion</button>
+        <button type="button" class="secondary" data-close="emotionForm">Cancel</button>
+      </form>
+    </section>
+
+    <section class="module" id="needsModule">
+      <div class="module-header">
+        <h2>Needs Board</h2>
+        <button class="add-btn parent-only" data-target="need">+ Add Need</button>
+      </div>
+      <div class="needs-filter parent-only" hidden>
+        <label for="needsCategory">Filter by category</label>
+        <select id="needsCategory"></select>
+      </div>
+      <div id="needsBoard" class="card-grid">
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-toilet.svg" alt="Toilet">
+          <p>Toilet</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-eat.svg" alt="Eat">
+          <p>Eat</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-drink.svg" alt="Drink">
+          <p>Drink</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-break.svg" alt="Break">
+          <p>Break</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-help.svg" alt="Help">
+          <p>Help</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-play.svg" alt="Play">
+          <p>Play</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-sleep.svg" alt="Sleep">
+          <p>Sleep</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-outside.svg" alt="Go Outside">
+          <p>Go Outside</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-music.svg" alt="Music">
+          <p>Music</p>
+        </div>
+        <div class="card fallback-card" data-default-card>
+          <img src="assets/placeholder-quiet.svg" alt="Quiet Time">
+          <p>Quiet Time</p>
+        </div>
+      </div>
+      <div id="needsSentence" class="sentence-banner child-only"></div>
+      <form id="needsForm" class="card-form parent-only" hidden>
+        <h3>Add / Edit Need</h3>
+        <label>
+          Phrase text
+          <input type="text" id="needText" required>
+        </label>
+        <label>
+          Category
+          <select id="needCategory" required>
+            <option value="Food">Food</option>
+            <option value="Activities">Activities</option>
+            <option value="Places">Places</option>
+          </select>
+        </label>
+        <label>
+          Upload image
+          <input type="file" id="needImage" accept="image/*">
+        </label>
+        <button type="submit" class="primary">Save Need</button>
+        <button type="button" class="secondary" data-close="needsForm">Cancel</button>
+      </form>
+    </section>
+
+    <section class="module" id="scheduleModule">
+      <div class="module-header">
+        <h2>Today's Schedule</h2>
+        <div class="parent-only button-row" hidden>
+          <button id="scheduleLibraryToggle" class="secondary">Toggle Library</button>
+          <button id="scheduleTemplateSave" class="secondary">Save Template</button>
+          <button id="scheduleTemplateLoad" class="secondary">Load Template</button>
+        </div>
+      </div>
+      <div id="scheduleChildView" class="schedule-view child-only"></div>
+      <div id="scheduleParentView" class="schedule-builder parent-only" hidden>
+        <div class="schedule-library">
+          <h3>Card Library</h3>
+          <div id="scheduleLibrary" class="card-grid small"></div>
+        </div>
+        <div class="schedule-dropzone">
+          <h3>Today's Plan</h3>
+          <div id="scheduleDrop" class="schedule-drop" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="module" id="nowNextModule">
+      <div class="module-header">
+        <h2>Now &amp; Next</h2>
+        <button class="add-btn parent-only" data-target="nownext">+ Save Preset</button>
+      </div>
+      <div class="now-next">
+        <div class="now-card" data-role="now">
+          <h3>Now</h3>
+          <div class="card-placeholder" id="nowCard" tabindex="0"></div>
+          <button class="secondary child-only" id="nowDone" hidden>Done</button>
+        </div>
+        <div class="next-card" data-role="next">
+          <h3>Next</h3>
+          <div class="card-placeholder" id="nextCard" tabindex="0"></div>
+        </div>
+      </div>
+      <form id="nowNextForm" class="card-form parent-only" hidden>
+        <h3>Create Now &amp; Next Preset</h3>
+        <label>Now text<input type="text" id="nowText" required></label>
+        <label>Next text<input type="text" id="nextText" required></label>
+        <label>Upload Now image<input type="file" id="nowImage" accept="image/*"></label>
+        <label>Upload Next image<input type="file" id="nextImage" accept="image/*"></label>
+        <button type="submit" class="primary">Save Preset</button>
+        <button type="button" class="secondary" data-close="nowNextForm">Cancel</button>
+      </form>
+      <div id="nowNextLibrary" class="parent-only now-next-library" hidden>
+        <label>Now from library
+          <select id="nowLibrarySelect"></select>
+        </label>
+        <label>Next from library
+          <select id="nextLibrarySelect"></select>
+        </label>
+        <button id="applyNowNextLibrary" class="secondary" type="button">Apply cards</button>
+      </div>
+      <div id="nowNextPresets" class="preset-list parent-only" hidden></div>
+    </section>
+
+    <section class="module" id="storyModule">
+      <div class="module-header">
+        <h2>Social Story &amp; Rewards</h2>
+        <button class="add-btn parent-only" data-target="story">+ New Story</button>
+      </div>
+      <div id="storyList" class="story-list"></div>
+
+      <form id="storyForm" class="card-form parent-only" hidden>
+        <h3>Create Social Story</h3>
+        <label>Story title<input type="text" id="storyTitle" required></label>
+        <label>Story text<textarea id="storyText" placeholder="Enter 3-6 short sentences" required></textarea></label>
+        <button type="button" id="storyMic" class="secondary">🎤 Speak</button>
+        <button type="button" id="storyGenerate" class="primary">Generate Steps</button>
+        <div id="storySteps" class="story-steps"></div>
+        <div class="button-row">
+          <button type="submit" class="primary">Save Story</button>
+          <button type="button" class="secondary" data-close="storyForm">Cancel</button>
+        </div>
+      </form>
+
+      <form id="rewardForm" class="card-form parent-only" hidden>
+        <h3>Link Reward</h3>
+        <label>Choose Story<select id="rewardStory"></select></label>
+        <label>Reward name<input type="text" id="rewardName" required></label>
+        <label>Target stickers<select id="rewardTarget"><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
+        <label>Upload reward image<input type="file" id="rewardImage" accept="image/*"></label>
+        <button type="submit" class="primary">Save Reward</button>
+        <button type="button" class="secondary" data-close="rewardForm">Cancel</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="pinModal" class="modal" hidden>
+    <div class="modal-content">
+      <h2>Parent Mode PIN</h2>
+      <p>Enter 4 digit PIN</p>
+      <input type="password" id="pinInput" maxlength="4" inputmode="numeric">
+      <div class="button-row">
+        <button id="pinSubmit" class="primary">Enter</button>
+        <button id="pinCancel" class="secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="rewardPopup" class="modal" hidden>
+    <div class="modal-content reward">
+      <h2>🎉 Reward Earned! 🎉</h2>
+      <img id="rewardPopupImage" alt="Reward">
+      <p id="rewardPopupText"></p>
+      <button id="rewardClose" class="primary">Close</button>
+    </div>
+  </div>
+
+  <template id="cardTemplate">
+    <div class="card" tabindex="0">
+      <img alt="">
+      <p></p>
+    </div>
+  </template>
+
+  <template id="storyStepTemplate">
+    <div class="story-step" draggable="true">
+      <img alt="">
+      <textarea></textarea>
+      <div class="step-controls">
+        <button type="button" class="secondary step-up">⬆</button>
+        <button type="button" class="secondary step-down">⬇</button>
+        <label class="upload-btn">Upload<input type="file" accept="image/*"></label>
+      </div>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

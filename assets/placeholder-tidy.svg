@@ -1,0 +1,6 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#E0FFE3'/>
+  <path d='M96 46 H104 V142' stroke='#3B7F4B' stroke-width='10' stroke-linecap='round'/>
+  <path d='M80 134 H120 L112 158 H88 Z' fill='#8FCA99' stroke='#3B7F4B' stroke-width='6'/>
+  <text x='100' y='182' font-family="'Poppins', 'Arial', sans-serif" font-size='22' text-anchor='middle' fill='#3B7F4B'>Tidy</text>
+</svg>

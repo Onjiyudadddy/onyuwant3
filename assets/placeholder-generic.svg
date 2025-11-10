@@ -1,0 +1,6 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#E3E7FF'/>
+  <circle cx='100' cy='90' r='50' fill='#FFFFFF' stroke='#4B4F8C' stroke-width='4'/>
+  <path d='M100 52 L110 82 H142 L116 100 L126 132 L100 112 L74 132 L84 100 L58 82 H90 Z' fill='#4B4F8C'/>
+  <text x='100' y='170' font-family="'Poppins', 'Arial', sans-serif" font-size='22' text-anchor='middle' fill='#4B4F8C'>Picture</text>
+</svg>

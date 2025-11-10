@@ -1,0 +1,9 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+  <rect width='200' height='200' rx='36' fill='#D9F1FF'/>
+  <path d='M70 132 C70 116 82 104 98 104 H122 C132 104 140 112 140 122 C140 134 130 142 118 142 H84 C76 142 70 138 70 132Z' fill='#FFE3C4' stroke='#2C5B7A' stroke-width='6'/>
+  <path d='M108 74 C120 76 128 86 128 96 C128 108 118 116 108 116' fill='none' stroke='#2C5B7A' stroke-width='6' stroke-linecap='round'/>
+  <circle cx='78' cy='74' r='6' fill='#7CC7FF'/>
+  <circle cx='90' cy='62' r='8' fill='#7CC7FF'/>
+  <circle cx='108' cy='56' r='10' fill='#7CC7FF'/>
+  <text x='100' y='182' font-family="'Poppins', 'Arial', sans-serif" font-size='22' text-anchor='middle' fill='#2C5B7A'>Wash</text>
+</svg>
